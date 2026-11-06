@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sa shqip di?</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;800&family=Nunito:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FCEFEF;--card:#fff;--red:#C0283D;--plum:#3B1020;--leaf:#4C8C4A;--line:#E8C9CC;--surface:#fff;--good:#E6F3E4;--bad:#FBE3E5;--tipbg:#FFF3E0;--info:#EAF1FB;--muted:#7a4a55;--btn:#C0283D;--fs:1}
+@media (prefers-color-scheme: dark){:root:not([data-mode="light"]){--bg:#1B0C13;--card:#2A1520;--red:#EE7480;--plum:#F6E4E7;--leaf:#7BC47A;--line:#4D2C38;--surface:#341B28;--good:#1F3A24;--bad:#4A2028;--tipbg:#3D2A18;--info:#1C2B40;--muted:#C9A3AC;color-scheme:dark}}
+:root[data-mode="dark"]{--bg:#1B0C13;--card:#2A1520;--red:#EE7480;--plum:#F6E4E7;--leaf:#7BC47A;--line:#4D2C38;--surface:#341B28;--good:#1F3A24;--bad:#4A2028;--tipbg:#3D2A18;--info:#1C2B40;--muted:#C9A3AC;color-scheme:dark}
+:root[data-size="large"]{--fs:1.2}
+html{font-size:calc(16px*var(--fs))}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--plum);font:500 1.0625rem/1.5 Nunito,system-ui,sans-serif;min-height:100vh}
+main{max-width:560px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2{font-family:Fraunces,Georgia,serif;font-weight:800;line-height:1.15;margin:.3em 0}
+h1{font-size:2.2rem}h2{font-size:1.45rem}
+.card{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:22px}
+.mascot{display:block;margin:0 auto 6px;width:120px;height:120px}
+.say{text-align:center;font-weight:700;color:var(--red);min-height:1.5em;margin:0 0 10px}
+button{font:700 1rem Nunito,sans-serif;border:0;border-radius:14px;padding:13px 18px;cursor:pointer;background:var(--btn);color:#fff;width:100%;margin-top:10px}
+button.alt{background:var(--surface);color:var(--red);border:2px solid var(--red)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
+.opt{background:var(--surface);color:var(--plum);border:2px solid var(--line);text-align:left;margin-top:8px}
+.opt.right{background:var(--good);border-color:var(--leaf)}
+.opt.wrong{background:var(--bad);border-color:var(--red)}
+.bar{height:10px;background:var(--line);border-radius:9px;overflow:hidden;margin:0 0 14px}
+.bar i{display:block;height:100%;background:var(--red);width:0;transition:width .3s}
+.meta{font-size:.9rem;color:var(--muted);margin-bottom:6px}
+input{font:inherit;background:var(--surface);color:var(--plum);width:100%;padding:13px;border:2px solid var(--line);border-radius:14px;margin-top:8px}
+.lvl{font:800 4rem/1 Fraunces,serif;color:var(--red);text-align:center;margin:4px 0}
+table{width:100%;overflow-wrap:anywhere;border-collapse:collapse;margin:10px 0}td{padding:5px 0;border-bottom:1px solid var(--line)}
+td:last-child{text-align:right;font-weight:700}
+.note{font-size:.9rem;color:var(--muted)}
+.hide{display:none}
+.rev{border-bottom:1px solid var(--line);padding:8px 0;font-size:.95rem;break-inside:avoid}
+.rev b{color:var(--red)}.rev .ok{color:var(--leaf);font-weight:700}
+.tip{background:var(--tipbg);border-radius:14px;padding:12px 14px;margin:12px 0;font-weight:700}
+.tip.info{background:var(--info);font-weight:600}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-9px)}75%{transform:translateX(9px)}}
+@keyframes slide{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+@keyframes fall{to{transform:translateY(108vh) rotate(720deg)}}
+#app.in{animation:slide .35s ease both}
+.lvl{animation:pop .7s .1s both}
+button{transition:transform .15s,border-color .2s}
+button:hover{transform:translateY(-2px)}
+button:active{transform:scale(.97)}
+.chips{margin:8px 0 4px}
+.chips span{display:inline-block;background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:1px 12px;margin:4px 4px 0 0;font-weight:700;color:var(--red);animation:pop .5s both}
+.conf{position:fixed;top:-20px;width:10px;height:14px;z-index:9;pointer-events:none;animation:fall 2.8s linear forwards}
+@keyframes glow{0%{box-shadow:0 0 0 0 rgba(76,140,74,.6)}100%{box-shadow:0 0 0 18px rgba(76,140,74,0)}}
+@keyframes burst{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+.opt.right{animation:glow .7s}
+.opt.wrong{animation:shake .4s}
+.spark{position:fixed;width:9px;height:9px;border-radius:50%;background:#F2B84B;z-index:9;pointer-events:none;animation:burst .7s ease-out forwards}
+.passage{background:var(--tipbg);border-left:5px solid var(--red);border-radius:12px;padding:12px 14px;margin:6px 0 12px;font-family:Fraunces,Georgia,serif;font-weight:600}
+.fb{border-radius:14px;padding:12px 14px;margin-top:12px;animation:pop .35s both}
+.fb.good{background:var(--good)}.fb.bad{background:var(--bad)}
+.tools{display:flex;gap:8px;justify-content:flex-end;margin-bottom:6px}
+button.tool{width:auto;margin:0;padding:6px 12px;background:var(--surface);color:var(--red);border:2px solid var(--line);font-size:.85rem}
+.map{position:relative;height:66px;margin:2px 0 4px}
+.map .track,.map .fill{position:absolute;left:12px;top:34px;height:8px;border-radius:8px}
+.map .track{right:12px;background:var(--line)}
+.map .fill{background:var(--red);transition:width .6s ease}
+.map .stop{position:absolute;top:30px;width:16px;height:16px;border-radius:50%;background:var(--surface);border:3px solid var(--line);transform:translateX(-50%)}
+.map .stop.mid{width:12px;height:12px;top:32px;border-width:2px}
+.map .stop.done{background:var(--red);border-color:var(--red)}.map .stop.now{border-color:var(--red)}
+.map .stop b{position:absolute;top:18px;left:50%;transform:translateX(-50%);font-size:.7rem;color:var(--muted);font-weight:700}
+.map svg{position:absolute;top:-2px;width:34px;height:34px;transform:translateX(-50%);transition:left .6s ease}
+.streak{float:right;font-weight:800;color:var(--red)}
+.chip2{display:inline-block;background:var(--tipbg);border:2px solid var(--line);border-radius:20px;padding:3px 12px;margin:4px 6px 0 0;font-weight:700;font-size:.9rem}
+.cityhello{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:1.5rem;line-height:1.15;margin:.3em 0}
+.fact{background:var(--info);border-radius:14px;padding:12px 14px;margin:12px 0}
+.fact b{display:block;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.amap{width:100%;height:auto;display:block;margin:8px 0}
+.amap .c0{fill:var(--line)}.amap .c1{fill:var(--red)}.amap .c2{fill:var(--red);opacity:.4}
+.amap text{fill:var(--plum);font:700 10px Nunito,Arial,sans-serif}
+.amap .cn{fill:#fff;font-size:11px;letter-spacing:.05em}
+.amap .pin{fill:var(--plum);stroke:var(--card);stroke-width:1.5}
+.amap text.pn{fill:var(--card);font:800 8px Nunito,Arial,sans-serif}
+.route{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.85rem;margin:2px 0 8px;padding:0;list-style:none}
+.route b{display:inline-block;min-width:1.4em;color:var(--red)}
+.amap .dot{fill:var(--plum)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.85rem;color:var(--muted);margin:2px 0 8px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.words{padding-left:20px;margin:6px 0}.words li{margin:5px 0}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.conf,.spark{display:none}}
+</style>
+
+</head>
+<body>
+<main>
+<div class="tools"><button class="tool" id="tsize" aria-label="Larger text">Aa</button><button class="tool" id="tmode" aria-label="Dark or light mode">Dark mode</button></div>
+<svg class="mascot" id="m" viewBox="0 0 120 120" aria-hidden="true"></svg>
+<p class="say" id="say"></p>
+<div class="card" id="app"></div>
+</main>
+<script>
+// ====== SETTINGS ======
+var PREPLY = "https://preply.com/en/tutor/3240239";
+// Address of this test, printed on the level card. Leave empty to use the page address automatically
+// (works once the page is on a website; when opened from a file the card shows no link).
+var TEST_URL = "";
+// =========================
+
+// First option is the correct answer; options are shuffled when shown.
+var LEVELS = [
+{l:"A1",q:[
+["Good morning in Albanian:",["Mirëmëngjes","Mirëmbrëma","Natën e mirë","Mirupafshim"]],
+["Unë ___ Anna.",["quhem","quhet","quhesh","quhen"]],
+["Ai ___ nga Shqipëria.",["është","jam","je","janë"]],
+["“Pesë” is the number:",["5","3","4","6"]],
+["“Thank you”:",["Faleminderit","Të lutem","Më fal","Mirë se vjen"]],
+["“Si je?” Best answer:",["Jam mirë, faleminderit","Quhem Ana","Nga Tirana","Mirupafshim"]]]},
+{l:"A2",q:[
+["Unë ___ kafe çdo mëngjes.",["pi","pinë","pimë","pini"]],
+["Ku ___ ti?",["banon","banoj","banojmë","banojnë"]],
+["Unë lexoj një ___ çdo mbrëmje.",["libër","libri","librin","librit"]],
+["Dje unë ___ në shkollë.",["shkova","shkoj","do të shkoj","shkon"]],
+["“Ora është tetë e gjysmë” means:",["8:30","7:30","8:15","8:45"]],
+["Motra ime ___ në Tiranë.",["jeton","jetoj","jetojmë","jetoni"]],
+["Ajo është një vajzë ___.",["e bukur","i bukur","të bukur","bukur"]]]},
+{l:"B1",q:[
+["Nesër ___ në Tiranë me autobus.",["do të shkoj","shkova","kam shkuar","shkoja"]],
+["Kur isha i vogël, ___ shumë futboll.",["luaja","luajta","kam luajtur","do të luaj"]],
+["Ajo ka ___ një libër shumë të bukur.",["lexuar","lexoi","lexonte","të lexuar"]],
+["Your friend texts “Po vonohem!” This means:",["I’m running late","I’m leaving now","I’m very tired","I’m hungry"]],
+["Nëse ___ shi, do të rrimë në shtëpi.",["bie","binte","ka rënë","të bjerë"]],
+["You want to ask for the bill in a café. You say:",["Faturën, ju lutem","Mirëmëngjes","Ku është tualeti?","Sa është ora?"]],
+["Ai flet shqip shumë ___.",["mirë","i mirë","e mirë","mirësi"]]]},
+{l:"B2",q:[
+["Po të kisha më shumë kohë, ___ më shumë.",["do të udhëtoja","do të udhëtoj","udhëtova","kam udhëtuar"]],
+["Njeriu ___ takova dje është mësuesi im.",["të cilin","i cili","të cilës","të cilët"]],
+["Dera u ___ nga era.",["mbyll","mbyllur","mbyllet","do mbyllur"]],
+["Synonym of “i zgjuar”:",["inteligjent","i shkujdesur","i lodhur","i uritur"]],
+["Kur arrita, filmi ___ filluar.",["kishte","ka","ishte","do të kishte"]],
+["Gjuha shqipe ___ në Kosovë dhe në Maqedoninë e Veriut.",["flitet","flet","folur","do flet"]],
+["Pse priti Vjosa një orë?",["Sepse e humbi trenin","Sepse treni u vonua","Sepse donte të pinte kafe","Sepse stacioni ishte i mbyllur"],"Kur arriti në stacion, treni kishte ikur. Ajo u detyrua të priste një orë dhe vendosi të pinte një çaj në kafenenë aty pranë."]]},
+{l:"C1",q:[
+["“Qenka” in “Qenka qyteti më i bukur që kam parë!” expresses:",["surprise at something unexpected","obligation","wish","command"]],
+["Sikur ta ___ më herët, nuk do të kishim humbur trenin.",["kishim ditur","dinim","dimë","kemi ditur"]],
+["Synonym of “i përkushtuar”:",["i devotshëm","i përtuar","i zemëruar","i vonuar"]],
+["Ai tha: “Do të vij nesër.” → Ai tha se ___ ditën tjetër.",["do të vinte","do të vij","do të vijë","erdhi"]],
+["___ rrugës, pashë një mik.",["Duke ecur","Ec","Ecën","Ecte"]],
+["Ai e ___ vendimin pa e menduar gjatë.",["mori","pati","bëri","dha"]],
+["Çfarë tregon teksti për Arbenin?",["Se ai zgjodhi të mbetej në qytet dhe hapi një biznes","Se ai u largua jashtë për të punuar","Se kafeneja e tij u mbyll shpejt","Se banorët nuk e pëlqenin kafenenë"],"Megjithëse shumë të rinj largohen nga qyteti për të punuar jashtë, Arbeni vendosi të qëndronte. Ai hapi një kafene të vogël dhe, me kalimin e kohës, ajo u bë vendi ku takoheshin të gjithë banorët."]]},
+{l:"C2",q:[
+["“Më ra ndër mend” means:",["it came to my mind","I fell over","I was upset","I agreed"]],
+["Someone has done you a big favour. A warm Albanian way to thank them is:",["Rrofsh sa malet!","Mirupafshim!","Më fal!","Natën e mirë!"]],
+["Falë ___ tij, projekti u mbarua.",["ndihmës së","ndihmën e","ndihma e","ndihmë së"]],
+["A friend is surprised that someone is already here and says “Paska ardhur!” This means:",["Apparently he’s already here!","He will arrive tomorrow","Did he arrive?","He never comes"]],
+["“I paepur” means:",["unyielding","calm","rich","confused"]],
+["“Mërgim” means:",["exile / living abroad","harvest","courage","friendship"]]]}
+];
+var PLAN={
+A1:["Learn greetings and polite phrases: Mirëmëngjes, Mirëmbrëma, Faleminderit, Të lutem.","Practise “jam” (I am) and “quhem” (I am called) with all persons.","Learn the numbers 1 to 20 and the days of the week."],
+A2:["Practise everyday verbs in the present tense for unë, ti, ai, ne, ata.","Learn the difference between “një libër” (a book) and “libri” (the book).","Learn to tell the time and to talk about yesterday with the simple past."],
+B1:["Learn the future with “do të” and the “has done” form with “kam” + verb.","Practise the past you use for habits (kur isha i vogël, luaja).","Learn polite phrases for cafes, shops and travel."],
+B2:["Practise “if” sentences with “po të kisha … do të …”.","Learn the relative words: të cilin, i cili, për të cilin.","Read short news texts and learn the “u” forms (dera u mbyll)."],
+C1:["Practise reported speech: Ai tha se do të vinte.","Learn the “surprise” forms (qenka, paska) and common idioms.","Read longer stories and write a short text with “megjithëse” and “sikur”."],
+C2:["Learn rare expressions and proverbs and their cultural background.","Practise the less common case endings (falë ndihmës së tij).","Read literature and write essays, or start helping others learn."]};
+var STOPS=["Tirana","Durrës","Berat","Vlorë","Shkodër","Ulcinj","Gjirokastër","Burrel","Theth","Prizren","Valbonë","Struga"];
+var MID=3;
+function stopStart(k){var cum=0;for(var q=0;q<Math.floor(k/2);q++)cum+=COUNTS[q];return cum+((k%2)?MID:0)}
+function stopFor(n){var li=Q[n].li,cum=0;for(var q=0;q<li;q++)cum+=COUNTS[q];return li*2+((n-cum>=MID)?1:0)}
+var CANDO={
+A1:["say hello and goodbye","introduce yourself with your name","count to ten and say thank you"],
+A2:["talk about your daily routine and your family","order a coffee and buy simple things","say what you did yesterday in short sentences"],
+B1:["travel on your own and ask for directions","talk about plans and past events","handle most situations in a shop, café or hotel"],
+B2:["follow conversations and news at normal speed","explain your opinion and use “if” sentences","tell a longer story and write a clear message"],
+C1:["understand jokes, idioms and long texts","express yourself fluently without searching for words","use Albanian for work or study"],
+C2:["understand almost everything you hear and read","express fine shades of meaning and emotion","speak like an educated native speaker"]};
+var TMSG={
+A1:"Mirë se vjen! Everybody starts here, and A1 is where the fun begins. A few weeks of small steps and you will be speaking your first full sentences. I can’t wait to hear them.",
+A2:"Bravo, you are on your way! You already have a base to build on. With a little regular practice, conversations will soon start to feel real.",
+B1:"Shumë mirë! This is the level where Albanian starts to feel like a language you can really use. Let’s turn your knowledge into confident speaking.",
+B2:"Të lumtë! You understand a lot already. The next step is sounding natural, and that is exactly what we practise in a lesson.",
+C1:"Urime! Your Albanian is strong. Now we polish the details: idioms, nuance and the way people really talk.",
+C2:"Të lumtë, shkëlqyeshëm! This is a rare level. Albanian is lucky to have you, and I would love to talk with you."};
+var WARM=[
+["“Tungjatjeta” means:",["hello","goodbye","sorry","thank you"],"“Tungjatjeta” is a friendly hello. This is a warm-up, so it does not count."],
+["Which word is a number?",["tre","ujë","mirë","po"],"“Tre” is three. Ujë = water, mirë = good or well, po = yes. This is a warm-up, so it does not count."]];
+var cityShown=-1, streak=0, bestStreak=0, seq=[], badges=[];
+var CITY=[
+{hello:"Mirë se erdhe në Tiranë!",intro:"You are in Tirana, the capital of Albania and the start of your journey. It is a lively city full of cafés, and you will hear Albanian all around you.",fact:"Tirana became the capital in 1920. In the early 2000s its grey buildings were repainted in bright colours, which is why you see so many today.",task:"Your task here: greetings and your very first words."},
+{"hello": "Mirë se erdhe në Durrës!", "intro": "You have reached Durrës, the main port of Albania on the Adriatic coast. Greek settlers founded the city about 2,600 years ago, and in Roman times it was called Dyrrachium.", "fact": "Durrës has a huge Roman amphitheatre, one of the largest in the Balkans, hidden between modern houses.", "task": "Your task here: introductions, numbers and everyday words."},
+{hello:"Mirë se erdhe në Berat!",intro:"You have reached Berat, the “city of a thousand windows”. White Ottoman houses climb the hillside above the river, and people meet for the evening walk.",fact:"Berat is a UNESCO World Heritage Site, and people have lived here for more than 2,000 years.",task:"Your task here: daily life, family, time and the simple past."},
+{"hello": "Mirë se erdhe në Vlorë!", "intro": "Welcome to Vlorë, a sunny city on the southern coast, where the Adriatic meets the Ionian Sea. In the evening everybody walks along the seafront.", "fact": "On 28 November 1912, Ismail Qemali raised the Albanian flag here and declared the country’s independence.", "task": "Your task here: telling what you did yesterday and where you live."},
+{hello:"Mirë se erdhe në Shkodër!",intro:"Welcome to Shkodër, a city in the north on the shore of Lake Shkodër, which Albania shares with Montenegro. It is a city of bicycles, poets and musicians.",fact:"Its castle, Rozafa, has a famous legend about a woman who was walled into the stones so that the castle would stand. Many Albanians know the story.",task:"Your task here: talk about plans and the past, and handle everyday situations."},
+{"hello": "Mirë se erdhe në Ulqin!", "intro": "You have crossed the border into Montenegro. Ulcinj (Ulqin in Albanian) is an old town on a cliff above the sea, and you hear Albanian here every day, in the streets and in the cafés.", "fact": "Most people in Ulcinj speak Albanian, and the town is famous for Velika Plaža, one of the longest sandy beaches on the Adriatic.", "task": "Your task here: future plans, habits and polite phrases."},
+{hello:"Mirë se erdhe në Gjirokastër!",intro:"You are in Gjirokastër, the stone city in the south, with grey stone roofs and steep streets. Here you hear the southern, Tosk melody of Albanian.",fact:"Ismail Kadare, Albania’s most famous writer, was born here, and UNESCO protects the old town.",task:"Your task here: longer sentences, “if” sentences and short texts."},
+{"hello": "Mirë se erdhe në Burrel!", "intro": "You have arrived in Burrel, the main town of the Mat region in the mountains of north-central Albania. It is far from the coast, the hills are all around, and the pace of life is slower.", "fact": "Skanderbeg, Albania’s national hero, came from this region. His family, the Kastriotis, held lands in the area of Mat and Dibër. King Zog I, who ruled Albania from 1925 to 1939, also came from Mat.", "fact2": "Under the communist regime (1944 to 1991), the prison of Burrel held many people who were jailed for political reasons. It is remembered as a symbol of that time.", "task": "Your task here: reading texts and explaining your opinion."},
+{hello:"Mirë se erdhe në Theth!",intro:"You are in Theth, a village in the Albanian Alps. There is no big city here, only mountains, stone houses and a waterfall. People still tell old stories at the table.",fact:"The old customs of the Kanun say the home belongs to God and the guest. That is why “mikpritje” (hospitality) is such an important word in Albanian.",task:"Your task here: nuance, idioms and reported speech."},
+{"hello": "Mirë se erdhe në Prizren!", "intro": "Welcome to Prizren, a beautiful old city in the south of Kosovo, with a stone bridge over the river and mosques, churches and old houses side by side.", "fact": "In 1878, Albanian leaders met here and founded the League of Prizren, an important moment for Albanian national identity and for the Albanian language.", "task": "Your task here: idioms, reported speech and fine shades of meaning."},
+{hello:"Mirë se erdhe në Valbonë!",intro:"You made it to Valbonë, a valley at the foot of the highest peaks. Most people arrive on foot over the mountain pass from Theth. Only strong learners get this far.",fact:"The Albanian Alps are called Bjeshkët e Nemuna, the “Accursed Mountains”. The hike between Theth and Valbonë is one of the most famous in the Balkans.",task:"Your task here: rare words, expressions and Albanian culture."},
+{"hello": "Mirë se erdhe në Strugë!", "intro": "Welcome to Struga (Strugë in Albanian), in North Macedonia, on the shore of Lake Ohrid. You hear both Albanian and Macedonian in the streets and cafés.", "fact": "Every August the town hosts the Struga Poetry Evenings, a famous international poetry festival where poets read in many languages.", "task": "Your task here: poetry-level vocabulary, proverbs and the finishing touches."}];
+var FACTS=[
+"Albanian forms a branch of its own in the Indo-European language family. It has no close living relatives.",
+"The Albanian alphabet has 36 letters, including 9 two-letter ones such as sh, zh, dh, gj and nj.",
+"There are two main dialects: Gheg in the north and Tosk in the south. Standard written Albanian (1972) is based mainly on Tosk.",
+"Albanians call their country Shqipëria, often explained as “land of the eagles”.",
+"Mother Teresa was born in Skopje to an Albanian family.",
+"“Besa” means word of honour. It is one of the most important values in Albanian culture."];
+var BORDERS={al:[[19.37, 41.85], [19.38, 42.0], [19.42, 42.15], [19.4, 42.3], [19.55, 42.45], [19.65, 42.58], [19.8, 42.5], [19.95, 42.47], [20.07, 42.55], [20.3, 42.43], [20.4, 42.2], [20.57, 42.03], [20.6, 41.88], [20.52, 41.65], [20.45, 41.5], [20.5, 41.3], [20.6, 41.08], [20.72, 40.92], [20.95, 40.86], [21.05, 40.65], [21.0, 40.5], [20.8, 40.4], [20.65, 40.15], [20.5, 39.95], [20.4, 39.88], [20.2, 39.75], [20.05, 39.68], [20.0, 39.65], [19.95, 39.8], [19.85, 40.0], [19.7, 40.2], [19.5, 40.35], [19.4, 40.5], [19.38, 40.7], [19.4, 40.9], [19.45, 41.1], [19.5, 41.33], [19.55, 41.55], [19.6, 41.8], [19.5, 41.83]],ks:[[20.07, 42.55], [20.15, 42.72], [20.3, 42.85], [20.55, 43.0], [20.8, 43.27], [21.1, 43.12], [21.35, 43.0], [21.55, 42.85], [21.7, 42.65], [21.79, 42.5], [21.75, 42.32], [21.55, 42.22], [21.3, 42.12], [21.05, 42.17], [20.85, 42.1], [20.6, 41.88], [20.57, 42.03], [20.4, 42.2], [20.3, 42.43]],me:[[18.45, 42.42], [18.75, 42.38], [18.85, 42.27], [19.1, 42.09], [19.2, 41.93], [19.37, 41.85], [19.38, 42.0], [19.42, 42.15], [19.4, 42.3], [19.55, 42.45], [19.65, 42.58], [19.8, 42.5], [19.95, 42.47], [20.07, 42.55], [20.15, 42.72], [20.3, 42.85], [20.35, 43.0], [19.9, 43.2], [19.4, 43.4], [19.05, 43.4], [18.7, 43.0], [18.55, 42.65]],mk:[[20.6, 41.88], [20.85, 42.1], [21.05, 42.17], [21.3, 42.12], [21.55, 42.22], [21.75, 42.32], [22.1, 42.3], [22.45, 42.32], [22.75, 42.15], [23.0, 41.95], [23.0, 41.35], [22.7, 41.15], [22.3, 40.95], [21.8, 40.9], [21.05, 40.85], [20.95, 40.86], [20.72, 40.92], [20.6, 41.08], [20.5, 41.3], [20.45, 41.5], [20.52, 41.65]]};
+var PLACES=[["Tirana",19.82,41.33,"j",0,0],["Durrës",19.45,41.32,"j",0,0],["Berat",19.95,40.7,"j",0,0],["Vlorë",19.49,40.47,"j",0,0],["Shkodër",19.51,42.07,"j",0,0],["Ulcinj",19.21,41.93,"j",0,0],["Gjirokastër",20.14,40.08,"j",0,0],["Burrel",20.01,41.61,"j",0,0],["Theth",19.77,42.42,"j",-5,0],["Prizren",20.74,42.21,"j",0,0],["Valbonë",19.88,42.47,"j",6,-3],["Struga",20.68,41.18,"j",0,0],["Prishtina",21.17,42.67,"k",1,8,4],["Tetovo",20.97,42.01,"d",-1,-6,12],["Skopje",21.43,42.0,"d",1,8,4],["Plav",19.95,42.6,"d",-1,-4,-8]];
+function albMap(){
+  var S=100,k=0.745,x0=18.3,y0=43.6;
+  function X(lo){return ((lo-x0)*k*S+10).toFixed(1)}function Y(la){return ((y0-la)*S+10).toFixed(1)}
+  function poly(a){return a.map(function(q){return X(q[0])+","+Y(q[1])}).join(" ")}
+  var h='<svg class="amap" viewBox="0 0 380 420" role="img" aria-label="Simplified map of the Albanian-speaking area">';
+  h+='<polygon class="c2" points="'+poly(BORDERS.mk)+'" stroke="var(--card)" stroke-width="1.5"/>';
+  h+='<polygon class="c2" points="'+poly(BORDERS.me)+'" stroke="var(--card)" stroke-width="1.5"/>';
+  h+='<polygon class="c1" points="'+poly(BORDERS.ks)+'" stroke="var(--card)" stroke-width="1.5"/>';
+  h+='<polygon class="c1" points="'+poly(BORDERS.al)+'" stroke="var(--card)" stroke-width="1.5"/>';
+  h+='<text class="cn" x="'+X(19.95)+'" y="'+Y(40.95)+'" text-anchor="middle">ALBANIA</text>';
+  h+='<text class="cn" x="'+X(21.0)+'" y="'+Y(42.85)+'" text-anchor="middle">KOSOVO</text>';
+  h+='<text x="'+X(22.0)+'" y="'+Y(41.55)+'" text-anchor="middle">NORTH</text><text x="'+X(22.0)+'" y="'+Y(41.55)+'" dy="12" text-anchor="middle">MACEDONIA</text>';
+  h+='<text x="'+X(19.2)+'" y="'+Y(43.2)+'" text-anchor="middle">MONTENEGRO</text>';
+  var jn=0;
+  PLACES.forEach(function(p){
+    var cx=+X(p[1]),cy=+Y(p[2]);
+    if(p[3]==="j"){jn++;cx+=p[4];cy+=p[5];
+      h+='<circle class="pin" cx="'+cx+'" cy="'+cy+'" r="6.5"/><text class="pn" x="'+cx+'" y="'+(cy+3)+'" text-anchor="middle">'+jn+'</text>';
+    }else{
+      h+='<circle class="dot" cx="'+cx+'" cy="'+cy+'" r="3"/><text x="'+(cx+p[5])+'" y="'+(cy+p[6])+'" text-anchor="'+(p[4]>0?"start":"end")+'" style="font-size:9.5px">'+p[0]+'</text>';
+    }
+  });
+  return h+'</svg>';
+}
+var IDK="I don’t know";
+var CHEER=["Provo prapë në pyetjen tjetër!","Mistakes are how Albanian sticks. Vazhdo!","Pa merak! You’ll see this one again.","Mirë, mësove diçka të re!"];
+var NOTES={
+A1:"Every Albanian speaker you admire started exactly here. You’ve taken the hardest step: starting. Focus on greetings, the word “jam” (I am), and numbers, and keep going!",
+A2:"Nice work! You can already handle everyday situations. Next, practise common daily verbs and how a word changes between “a book” and “the book” (libër, libri). Small daily practice will move you up fast.",
+B1:"Shumë mirë! You can handle most everyday situations. Work next on talking about the past and the future and on saying what you want other people to do. You’re already close.",
+B2:"Bravo! You follow longer texts and conversations. To sound more natural, practise “if … then” sentences, telling longer stories, and polite everyday phrases.",
+C1:"Urime! You speak Albanian at an advanced level. Now it’s about nuance: showing surprise, idioms, and sounding natural in different situations. You’re in the top group of learners.",
+C2:"Të lumtë, shkëlqyeshëm! Near-native mastery, and that is rare for Albanian. You could teach this language yourself!"};
+var EXPL=[
+"“Mirëmëngjes” is what you say in the morning (mëngjes = morning). In the evening you say Mirëmbrëma, before bed Natën e mirë, and when leaving Mirupafshim.",
+"“Quhem” means “I am called”. It changes with the person: unë quhem, ti quhesh, ai quhet, ata quhen.",
+"“Është” means “is” for he, she or it. Unë jam = I am, ti je = you are, ata janë = they are.",
+"“Pesë” is five. A few neighbours to remember: tre = 3, katër = 4, gjashtë = 6.",
+"“Faleminderit” means thank you. “Të lutem” is please (or you’re welcome), “Më fal” is sorry, and “Mirë se vjen” is welcome.",
+"“Si je?” means “How are you?”, so the natural answer is “Jam mirë, faleminderit” (I’m fine, thank you).",
+"With “unë” you say “pi”: unë pi kafe (I drink coffee). Ata pinë = they drink, ne pimë = we drink.",
+"When you talk to one person (“ti”), the verb usually ends in -n: ti banon (you live). Unë banoj, ai banon, ne banojmë, ata banojnë.",
+"After “një” (a) you use the plain word: një libër. “Libri” and “librin” mean “the book”.",
+"“Dje” means yesterday, so you use the form for something already finished: unë shkova. “Shkoj” = I go, “do të shkoj” = I will go.",
+"“Tetë” is eight and “gjysmë” is half, so “tetë e gjysmë” is half past eight: 8:30.",
+"The sentence is about “motra ime” (my sister), who is “ajo” (she), so the verb ends like this: ajo jeton. Compare unë jetoj, ti jeton.",
+"“Vajzë” is a girl, and “e bukur” goes with girls and women. For a boy you say “djalë i bukur”. The little word before the adjective (i, e) depends on what you describe.",
+"“Nesër” means tomorrow. To say what you will do, use “do të” + the verb: do të shkoj (I will go).",
+"“Kur isha i vogël” (when I was little) talks about something you did again and again, so you say “luaja” (I used to play).",
+"“Ka lexuar” means “has read”. “Ka” + “lexuar” is the usual way to say you have done something.",
+"“Po vonohem” means “I’m running late”. It is a very common thing to text a friend.",
+"After “nëse” (if) you use the normal present: Nëse bie shi (if it rains), do të rrimë në shtëpi (we will stay at home).",
+"“Faturën, ju lutem” means “The bill, please”. “Faturë” is the bill or receipt, and “ju lutem” is the polite way to say please.",
+"“Mirë” (well) tells us how he speaks. “I mirë” and “e mirë” describe a person or thing (good), not how someone does something.",
+"“Po të kisha” means “if I had”, and it goes with “do të udhëtoja” (I would travel). It is the usual pattern for “if I had more time, I would…”.",
+"“Të cilin” means “whom” or “that” here: njeriu të cilin takova (the man I met).",
+"“Dera u mbyll” means the door closed (the wind closed it). “U” before a verb often shows that something happened to the thing.",
+"“Inteligjent” and “i zgjuar” both mean clever. The other options mean careless, tired, and hungry.",
+"“Kur arrita, filmi kishte filluar” means the film had already started when I arrived. “Kishte” + “filluar” shows something happened earlier.",
+"“Flitet” means “is spoken”. It is the natural way to say which language is spoken where.",
+"The text says the train had already left (“treni kishte ikur”) when she arrived, so she had to wait an hour. In other words, she missed it.",
+"“Qenka” shows surprise: you have just noticed or found out something. “Look, it turns out to be the most beautiful town I’ve seen!”",
+"“Sikur ta kishim ditur” means “if we had known”. You use it for something you wish had gone differently in the past.",
+"“I përkushtuar” means devoted or dedicated. “I devotshëm” is close in meaning, while the other options are lazy, angry, and late.",
+"When you tell what someone said about the future, “do të vij” becomes “do të vinte”: Ai tha se do të vinte (he said he would come).",
+"“Duke” + a verb means “while doing”: duke ecur = while walking. So: Duke ecur rrugës, pashë një mik (While walking along the street, I saw a friend).",
+"The usual phrase is “marr një vendim” (to make a decision). Here: ai e mori vendimin (he made the decision).",
+"The text says that although many young people leave, Arbeni “vendosi të qëndronte” (decided to stay) and opened a café. So he chose to stay in town and start a business.",
+"“Më ra ndër mend” means “it came to my mind”. “Ra” can also mean “fell”, but in this phrase you can’t translate word by word, so learn it as a whole.",
+"“Rrofsh sa malet” literally means “may you live as long as the mountains”. People say it to thank someone warmly and to wish them a long life. Mirupafshim = goodbye, Më fal = sorry, Natën e mirë = good night.",
+"After “falë” (thanks to) the next word changes its ending: falë ndihmës së tij (thanks to his help). It is a pattern worth learning as a whole.",
+"“Paska” adds surprise or “apparently”: Paska ardhur! means “He has already come, I didn’t expect that!” It works like “qenka” in a similar situation.",
+"“I paepur” means unyielding, someone who does not give in.",
+"“Mërgim” means exile or living abroad as an emigrant, a very important word in Albanian culture."
+];
+
+var NEWQ={"0": [["Good evening in Albanian:", ["Mirëmbrëma", "Mirëmëngjes", "Natën e mirë", "Faleminderit"], null, "“Mirëmbrëma” is what you say in the evening (mbrëma = evening). “Mirëmëngjes” is for the morning and “Natën e mirë” is for going to bed."], ["“Po” means:", ["yes", "no", "please", "thank you"], null, "“Po” means yes and “jo” means no. Be careful, because “po” can look like “no” for English speakers."], ["“Ujë” means:", ["water", "bread", "milk", "coffee"], null, "“Ujë” is water. Bukë = bread, qumësht = milk, kafe = coffee."], ["Unë ___ student.", ["jam", "je", "është", "jemi"], null, "With “unë” (I) you say “jam”: unë jam student (I am a student). Ti je = you are, ai është = he is, ne jemi = we are."]], "1": [["Sa është dy plus tre?", ["pesë", "katër", "gjashtë", "shtatë"], null, "Dy (2) + tre (3) = pesë (5). Katër = 4, gjashtë = 6, shtatë = 7."], ["Ne ___ në shkollë çdo ditë.", ["shkojmë", "shkoj", "shkon", "shkojnë"], null, "With “ne” (we) the verb ends in -më: ne shkojmë (we go). Unë shkoj, ai shkon, ata shkojnë."], ["“Gjyshja ime” means:", ["my grandmother", "my sister", "my mother", "my aunt"], null, "“Gjyshe” is grandmother, “gjyshja” is “the grandmother” and “ime” means “my”. Motra = sister, nëna = mother, halla = aunt."]], "2": [["Nesër unë ___ një mik në qytet.", ["do të takoj", "takova", "kam takuar", "takoja"], null, "“Nesër” means tomorrow, so you need the future: “do të” + verb. Do të takoj = I will meet."], ["“Ku është stacioni?” means:", ["Where is the station?", "When is the train?", "How much is the ticket?", "What time is it?"], null, "“Ku” is where and “stacioni” is the station. Kur = when, sa = how much."], ["Më duhet të ___ herët nesër.", ["ngrihem", "ngrihesh", "ngrihet", "ngrihemi"], null, "After “më duhet të” (I have to) you use the form that matches “unë”: ngrihem (I get up). Ngrihesh = you get up, ngrihet = he gets up."]], "3": [["Synonym of “i vështirë”:", ["i ndërlikuar", "i lehtë", "i shpejtë", "i ftohtë"], null, "“I vështirë” means difficult, close to “i ndërlikuar” (complicated). “I lehtë” is the opposite (easy)."], ["Ky është libri ___ po flisja.", ["për të cilin", "të cilin", "i cili", "të cilët"], null, "You say “flas për” (I talk about), so the word “për” has to come before the pronoun: për të cilin (about which)."], ["Projekti u ___ me sukses nga ekipi.", ["përfundua", "përfundoj", "përfundon", "përfundova"], null, "“U përfundua” means “was finished”. “U” + the past form shows that something was done to the thing, here the project."]], "4": [["___ ishte i lodhur, ai vazhdoi të punonte.", ["Megjithëse", "Sepse", "Prandaj", "Nëse"], null, "“Megjithëse” means although. Sepse = because, prandaj = therefore, nëse = if."], ["“Ia dola mbanë” means:", ["I managed to do it", "I gave up", "I forgot", "I was late"], null, "“Ia dola mbanë” is an idiom meaning “I managed it / I succeeded”. You can’t translate it word by word."], ["“I pazëvendësueshëm” means:", ["irreplaceable", "unnecessary", "unusual", "impossible"], null, "“Pa-” means without and “zëvendësoj” means to replace, so “i pazëvendësueshëm” is irreplaceable."]], "5": [["“Rrëfim” is closest to:", ["a telling / account", "a punishment", "a journey", "an argument"], null, "“Rrëfim” comes from “rrëfej” (to tell, to confess). It means an account or story, and also confession."], ["“Ia mbylla gojën” means:", ["I silenced him", "I kissed him", "I fed him", "I called him"], null, "Literally “I closed his mouth”. It is an idiom meaning you made someone stop talking, or left them with nothing to say."], ["“Mikpritje” means:", ["hospitality", "loyalty", "bravery", "humour"], null, "“Mikpritje” is hospitality, “mik” is guest or friend and “pritje” is welcoming. It is one of the most important Albanian values."], ["“I pashembullt” means:", ["unprecedented", "ordinary", "expensive", "gentle"], null, "“Pa-” means without and “shembull” means example, so “i pashembullt” is without example: unprecedented, unmatched."]]};
+var COUNTS=[6,7,7,7,7,6];
+var WORDS={"0": [["Mirëmëngjes", "good morning"], ["quhem", "I am called"], ["është", "is (he, she, it)"], ["pesë", "five"], ["Faleminderit", "thank you"], ["Jam mirë", "I am fine"], ["Mirëmbrëma", "good evening"], ["po / jo", "yes / no"], ["ujë", "water"], ["jam", "I am"]], "1": [["pi", "I drink"], ["banon", "you live"], ["libër / libri", "a book / the book"], ["shkova", "I went"], ["tetë e gjysmë", "half past eight"], ["jeton", "she lives"], ["e bukur", "beautiful (for a girl or woman)"], ["dy, tre, pesë", "two, three, five"], ["shkojmë", "we go"], ["gjyshja", "the grandmother"]], "2": [["do të shkoj", "I will go"], ["luaja", "I used to play"], ["ka lexuar", "has read"], ["po vonohem", "I am running late"], ["nëse", "if"], ["faturën", "the bill"], ["mirë", "well"], ["do të takoj", "I will meet"], ["stacioni", "the station"], ["ngrihem", "I get up"]], "3": [["po të kisha", "if I had"], ["të cilin", "whom, which"], ["u mbyll", "was closed"], ["i zgjuar", "clever"], ["kishte filluar", "had started"], ["flitet", "is spoken"], ["kishte ikur", "had left"], ["i vështirë", "difficult"], ["për të cilin", "about which"], ["u përfundua", "was finished"]], "4": [["qenka", "it turns out to be (surprise)"], ["sikur ta kishim ditur", "if we had known"], ["i përkushtuar", "dedicated"], ["do të vinte", "he would come"], ["duke ecur", "while walking"], ["mori vendimin", "made the decision"], ["vendosi të qëndronte", "decided to stay"], ["megjithëse", "although"], ["ia dola mbanë", "I managed it"], ["i pazëvendësueshëm", "irreplaceable"]], "5": [["më ra ndër mend", "it came to my mind"], ["rrofsh sa malet", "may you live as long as the mountains (warm thanks)"], ["falë ndihmës", "thanks to the help"], ["paska ardhur", "apparently he has come"], ["i paepur", "unyielding"], ["mërgim", "exile, living abroad"], ["rrëfim", "account, telling"], ["ia mbylla gojën", "I silenced him"], ["mikpritje", "hospitality"], ["i pashembullt", "unprecedented"]]};
+(function(){var n=0;LEVELS.forEach(function(L,li){L.q.forEach(function(x){x[3]=EXPL[n++]});(NEWQ[li]||[]).forEach(function(x){L.q.push(x)});L.q.forEach(function(x,ix){x[4]=WORDS[li][ix]})})})();
+var Q = [];
+function need(k){return Math.ceil(COUNTS[k]*0.66)} // correct answers needed to pass a level
+// Picks a random set of questions from each level's pool, in level order.
+function buildTest(){
+  Q=[];
+  LEVELS.forEach(function(L,li){
+    shuffle(L.q).slice(0,COUNTS[li]).forEach(function(x){Q.push({li:li,p:x[0],o:x[1],t:x[2],e:x[3],w:x[4]})});
+  });
+}
+var profileText="", peak="", wordsList=[], answers=[], i=0, score=[0,0,0,0,0,0], locked=false, name="", levelText="", detail="";
+var app=document.getElementById("app"), say=document.getElementById("say"), m=document.getElementById("m");
+
+function shega(mood){
+  function eye(cx,kind){
+    if(kind==="closed")return '<path d="M'+(cx-7)+' 66q7-9 14 0" fill="none" stroke="#3B1020" stroke-width="4" stroke-linecap="round"/>';
+    if(kind==="star"){var pts=[];for(var k=0;k<10;k++){var r=k%2?3.6:8,a=-1.5708+k*0.6283;pts.push((cx+r*Math.cos(a)).toFixed(1)+","+(65+r*Math.sin(a)).toFixed(1))}return '<polygon points="'+pts.join(" ")+'" fill="#F2B84B" stroke="#3B1020" stroke-width="1.5"/>'}
+    var R=kind==="wide"?8:6, dx=kind==="up"?2:0, dy=kind==="down"?2.5:(kind==="up"?-2.5:1);
+    return '<circle cx="'+cx+'" cy="64" r="'+R+'" fill="#fff"/><circle cx="'+(cx+dx)+'" cy="'+(64+dy)+'" r="'+(kind==="wide"?3.5:3)+'" fill="#3B1020"/>';
+  }
+  var M={
+    smile:{e:["open","open"],mouth:'<path d="M46 82q14 12 28 0" fill="none" stroke="#3B1020" stroke-width="4" stroke-linecap="round"/>',extra:""},
+    happy:{e:["closed","closed"],mouth:'<path d="M44 80q16 20 32 0z" fill="#3B1020"/><path d="M52 90q8 5 16 0" fill="#E8626F" stroke="none"/>',extra:""},
+    sad:{e:["down","down"],mouth:'<path d="M46 88q14-11 28 0" fill="none" stroke="#3B1020" stroke-width="4" stroke-linecap="round"/>',extra:'<path d="M38 50l14 5M82 50l-14 5" stroke="#3B1020" stroke-width="3.5" stroke-linecap="round"/><path d="M42 74q-4 7 0 10 4-3 0-10z" fill="#6FB1E8"/>'},
+    think:{e:["up","up"],mouth:'<path d="M50 85h20" stroke="#3B1020" stroke-width="4" stroke-linecap="round"/>',extra:'<path d="M38 53h14" stroke="#3B1020" stroke-width="3.5" stroke-linecap="round"/><path d="M68 49l14-2" stroke="#3B1020" stroke-width="3.5" stroke-linecap="round"/><text x="92" y="38" font-size="26" font-weight="800" fill="#3B1020" font-family="Nunito,Arial,sans-serif">?</text>'},
+    wow:{e:["wide","wide"],mouth:'<ellipse cx="60" cy="86" rx="7" ry="9" fill="#3B1020"/>',extra:'<path d="M38 50q8-7 16 0M66 50q8-7 16 0" fill="none" stroke="#3B1020" stroke-width="3.5" stroke-linecap="round"/>'},
+    star:{e:["star","star"],mouth:'<path d="M42 80q18 24 36 0z" fill="#3B1020"/><path d="M51 91q9 6 18 0" fill="#E8626F"/>',extra:""}
+  };
+  var d=M[mood]||M.smile;
+  m.innerHTML='<path d="M60 22l-9-12 7 4 2-8 2 8 7-4z" fill="#4C8C4A"/>'+
+  '<path d="M44 26q-14-6-16 4 12 2 16-4zM76 26q14-6 16 4-12 2-16-4z" fill="#4C8C4A"/>'+
+  '<circle cx="60" cy="68" r="42" fill="#C0283D"/><path d="M46 28h28l-4 10H50z" fill="#9E1F31"/>'+
+  eye(46,d.e[0])+eye(74,d.e[1])+
+  '<circle cx="36" cy="78" r="5" fill="#E8626F" opacity=".7"/><circle cx="84" cy="78" r="5" fill="#E8626F" opacity=".7"/>'+d.extra+d.mouth;
+}
+function anim(){app.classList.remove("in");void app.offsetWidth;app.classList.add("in")}
+function burst(b){var r=b.getBoundingClientRect();for(var k=0;k<10;k++){var d=document.createElement("div");d.className="spark";var a=k/10*6.283;d.style.left=(r.left+r.width/2)+"px";d.style.top=(r.top+r.height/2)+"px";d.style.setProperty("--dx",Math.cos(a)*70+"px");d.style.setProperty("--dy",Math.sin(a)*70+"px");document.body.appendChild(d);(function(x){setTimeout(function(){x.remove()},800)})(d)}}
+function confetti(){
+  var cols=["#C0283D","#4C8C4A","#F2B84B","#3B1020","#E8626F"];
+  for(var k=0;k<60;k++){var d=document.createElement("div");d.className="conf";
+    d.style.left=Math.random()*100+"vw";d.style.background=cols[k%cols.length];
+    d.style.animationDelay=(Math.random()*0.8)+"s";d.style.animationDuration=(2+Math.random()*1.5)+"s";
+    document.body.appendChild(d);(function(x){setTimeout(function(){x.remove()},4500)})(d)}
+}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function shuffle(a){a=a.slice();for(var k=a.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1));var t=a[k];a[k]=a[j];a[j]=t}return a}
+function totalScore(){return score.reduce(function(a,b){return a+b},0)}
+
+function start(){anim();
+  shega("smile"); say.textContent="Tungjatjeta! Sa shqip di?";
+  app.innerHTML='<h1>Find your Albanian level</h1><p>40 questions, from A1 to C2. It takes about 10 minutes. No dictionaries, no AI, just you.</p><div class="tip">Please don’t guess. If you don’t know an answer, press “I don’t know”. It costs you nothing and gives you a fairer result.</div><div class="chips"><span style="animation-delay:.1s">A1</span><span style="animation-delay:.2s">A2</span><span style="animation-delay:.3s">B1</span><span style="animation-delay:.4s">B2</span><span style="animation-delay:.5s">C1</span><span style="animation-delay:.6s">C2</span></div><button id="go">Start the test</button>';
+  document.getElementById("go").onclick=function(){i=0;answers=[];score=[0,0,0,0,0,0];streak=0;bestStreak=0;seq=[];cityShown=-1;buildTest();warm(0)};
+}
+function warm(k){
+  if(k>=WARM.length){show();return}
+  var w=WARM[k],right=w[1][0],locked2=false;anim();
+  shega("smile");say.textContent="Let’s warm up first!";
+  app.innerHTML='<div class="meta">Warm-up '+(k+1)+' of '+WARM.length+' (does not count)</div><h2>'+esc(w[0])+'</h2><div id="opts"></div>';
+  var box=document.getElementById("opts");
+  shuffle(w[1]).forEach(function(t){
+    var b=document.createElement("button");b.className="opt";b.textContent=t;
+    b.onclick=function(){
+      if(locked2)return;locked2=true;var ok=(t===right);
+      b.classList.add(ok?"right":"wrong");
+      if(!ok)[].forEach.call(box.children,function(c){if(c.textContent===right)c.classList.add("right")});
+      shega(ok?"happy":"sad");say.textContent=ok?"Të lumtë!":"No worries, this one is just practice.";
+      var fb=document.createElement("div");fb.className="fb "+(ok?"good":"bad");fb.innerHTML="<b>"+(ok?"Correct! ":"The answer is "+esc(right)+". ")+"</b>"+esc(w[2]);box.appendChild(fb);
+      var nx=document.createElement("button");nx.textContent=(k<WARM.length-1)?"Next warm-up":"Start the real test";nx.onclick=function(){warm(k+1)};box.appendChild(nx);
+      if(nx.scrollIntoView)nx.scrollIntoView({behavior:"smooth",block:"center"});
+    };
+    box.appendChild(b);
+  });
+}
+function mapHTML(p){
+  var L="calc(12px + (100% - 24px) * ";
+  var h='<div class="map" id="map" aria-hidden="true"><div class="track"></div><div class="fill" id="mfill" style="width:'+L+p+')"></div>';
+  for(var k=0;k<12;k++){
+    var pk=stopStart(k)/Q.length,nxt=(k<11)?stopStart(k+1):Q.length+1,st=(i>=nxt)?"done":((i>=stopStart(k))?"now":"");
+    h+='<div class="stop '+st+(k%2?" mid":"")+'" style="left:'+L+pk+')">'+(k%2?'':'<b>'+LEVELS[k/2].l+'</b>')+'</div>';
+  }
+  return h+'<svg id="mmark" viewBox="0 0 120 120" style="left:'+L+p+')">'+m.innerHTML+'</svg></div>';
+}
+function arrive(k){
+  var c=CITY[k],li=Math.floor(k/2);anim();
+  shega("smile");say.textContent=(k===0)?"Your journey begins!":((k%2===0)?"Level "+LEVELS[li-1].l+" done! Bravo!":"Halfway through level "+LEVELS[li].l+"!");
+  var p0=Math.max(0,i-1)/Q.length,p1=i/Q.length;
+  app.innerHTML=mapHTML(p0)+'<div class="meta">Stop '+(k+1)+' of 12 · level '+LEVELS[li].l+'</div><div class="cityhello">'+esc(c.hello)+'</div><p>'+esc(c.intro)+'</p><div class="fact"><b>Did you know?</b>'+esc(c.fact)+'</div>'+(c.fact2?'<div class="fact"><b>A memory of hard times</b>'+esc(c.fact2)+'</div>':'')+'<p class="note">'+esc(c.task)+'</p><button id="goq">Continue</button>';
+  var L2="calc(12px + (100% - 24px) * ";
+  requestAnimationFrame(function(){requestAnimationFrame(function(){
+    var f=document.getElementById("mfill"),mk=document.getElementById("mmark");
+    if(f)f.style.width=L2+p1+")";if(mk)mk.style.left=L2+p1+")";});});
+  document.getElementById("goq").onclick=show;
+}
+function show(){
+  var sf=stopFor(i);if(sf!==cityShown){cityShown=sf;arrive(sf);return}
+  var q=Q[i], opts=shuffle(q.o).concat([IDK]), right=q.o[0]; locked=false; anim();
+  shega("smile"); say.textContent="";
+  var p0=Math.max(0,i-1)/Q.length,p1=i/Q.length;
+  app.innerHTML=mapHTML(p0)+'<div class="meta">Question '+(i+1)+' of '+Q.length+' · '+LEVELS[q.li].l+' · '+STOPS[stopFor(i)]+(streak>=2?'<span class="streak" id="stk">Streak '+streak+'</span>':'<span class="streak" id="stk"></span>')+'</div>'+(q.t?'<div class="passage">'+esc(q.t)+'</div>':'')+'<h2>'+esc(q.p)+'</h2><div id="opts"></div>';
+  var L2="calc(12px + (100% - 24px) * ";
+  requestAnimationFrame(function(){requestAnimationFrame(function(){
+    var f=document.getElementById("mfill"),mk=document.getElementById("mmark");
+    if(f)f.style.width=L2+p1+")";if(mk)mk.style.left=L2+p1+")";});});
+  var box=document.getElementById("opts");
+  opts.forEach(function(t){
+    var b=document.createElement("button");b.className="opt";b.textContent=t;if(t===IDK)b.style.fontStyle="italic";
+    b.onclick=function(){
+      if(locked)return;locked=true;
+      var ok=(t===right);answers[i]={p:q.p,a:t,r:right,ok:ok,l:LEVELS[q.li].l,e:q.e,t:q.t,w:q.w};
+      streak=ok?streak+1:0;if(streak>bestStreak)bestStreak=streak;seq.push(ok?1:0);
+      if(ok)score[q.li]++;
+      if(t!==IDK)b.classList.add(ok?"right":"wrong");
+      if(!ok)[].forEach.call(box.children,function(c){if(c.textContent===right)c.classList.add("right")});
+      shega(ok?"happy":(t===IDK?"think":"sad")); if(ok)burst(b); say.textContent=ok?"Të lumtë!":(t===IDK?"Faleminderit for being honest!":CHEER[i%CHEER.length]);
+      var fb=document.createElement("div");fb.className="fb "+(ok?"good":"bad");fb.innerHTML="<b>"+(ok?"Correct! ":(t===IDK?"No problem. The answer is ":"Not quite. The answer is ")+esc(right)+". ")+"</b>"+esc(q.e);box.appendChild(fb);
+      var sk=document.getElementById("stk");if(sk)sk.textContent=streak>=2?"Streak "+streak:"";
+      if(ok&&streak>=3)say.textContent="Të lumtë! "+streak+" in a row!";
+      var nx=document.createElement("button");nx.textContent=(i<Q.length-1)?"Next":"Finish";nx.onclick=function(){i++;i<Q.length?show():ask()};box.appendChild(nx);
+      if(nx.scrollIntoView)nx.scrollIntoView({behavior:"smooth",block:"center"});
+    };
+    box.appendChild(b);
+  });
+}
+function ask(){anim();
+  shega("wow"); say.textContent="Ke mbaruar! You finished!";
+  app.innerHTML='<h2>Almost done. What’s your name?</h2><input id="nm" placeholder="Your name" autocomplete="name"><button id="see">See my level</button>';
+  document.getElementById("see").onclick=function(){
+    var v=document.getElementById("nm").value.trim();
+    if(!v){document.getElementById("nm").focus();return}
+    name=v;result();
+  };
+}
+function result(){anim();
+  // Levels must be passed in a row: stop at the first level that is not passed.
+  var best=0;for(var k=0;k<LEVELS.length;k++){if(score[k]>=need(k))best=k;else break}
+  levelText=LEVELS[best].l;
+  var total=totalScore();
+  // Explain the profile, especially when it is uneven (e.g. C2 right but A1 wrong).
+  var P=score.map(function(s,k){return s>=need(k)}), top=-1, gaps=[];
+  P.forEach(function(p,k){if(p)top=k});
+  for(var g=0;g<top;g++)if(!P[g])gaps.push(LEVELS[g].l);
+  peak=(top>best)?LEVELS[top].l:"";
+  if(top<0){
+    profileText="You did not reach the pass mark in any level yet, so your starting point is A1. That is completely normal for a beginner. Your score of "+total+"/"+Q.length+(total<=12?" is close to what random guessing gives, so it only shows that you are at the very start.":" shows you already know some words. The first step is to build a base: greetings, “jam” (I am), numbers and simple sentences.");
+  }else if(!gaps.length){
+    profileText=(best===5)
+      ?"You passed all six levels. Your answers are consistent from A1 to C2, so this estimate is very reliable."
+      :"Your answers are consistent: you passed every level up to "+levelText+" and then did not reach the pass mark at "+LEVELS[best+1].l+". That makes "+levelText+" a reliable estimate. Your next goal is "+LEVELS[best+1].l+".";
+  }else{
+    var low=(P[0]===false||P[1]===false);
+    profileText="Your answers are uneven. You passed "+LEVELS[top].l+" but not "+gaps.join(", ")+". "+
+      (low&&top>=3
+        ?"This pattern is common for people who grew up hearing Albanian at home or with family: you know advanced words, expressions and meanings, but you never studied the basic grammar (verb endings, cases) or spelling. It can also be a few lucky guesses or careless mistakes on easy questions. "
+        :"This can happen when you know some topics well and others not at all, or when you guess a few answers or make careless mistakes. ")+
+      "Your level is the point where your base is solid, which is "+levelText+" (every level up to there passed). Your strongest area reaches "+LEVELS[top].l+". "+
+      (total<20?"With "+total+"/"+Q.length+" points, keep in mind that pure guessing gives about 10, so this result is less reliable. ":"")+
+      "A short chat with a teacher will show which of these is true for you, and what to work on first: the gaps in "+gaps.join(", ")+".";
+  }
+  detail=LEVELS.map(function(L,k){return L.l+" "+score[k]+"/"+COUNTS[k]}).join(", ");
+  computeBadges(best);
+  var seen={};wordsList=[];answers.forEach(function(a){if(!a.ok&&a.w&&!seen[a.w[0]]){seen[a.w[0]]=1;wordsList.push(a.w)}});
+  shega("star"); say.textContent="Urime, "+name+"!";
+  var rows=LEVELS.map(function(L,k){return "<tr><td>"+L.l+"</td><td>"+score[k]+" / "+COUNTS[k]+"</td></tr>"}).join("");
+  app.innerHTML='<p class="meta" style="text-align:center">'+esc(name)+', your estimated level is</p><div class="lvl">'+levelText+'</div><p style="text-align:center">Total score: '+total+' / '+Q.length+'</p><table>'+rows+'</table>'+
+  (badges.length?'<div>'+badges.map(function(b){return '<span class="chip2">'+esc(b)+'</span>'}).join("")+'</div>':'')+
+  '<div class="tip">'+NOTES[levelText]+'</div>'+
+  '<h2>At '+levelText+' you can</h2><ul style="padding-left:20px;margin:6px 0">'+CANDO[levelText].map(function(t){return "<li style='margin:5px 0'>"+esc(t)+"</li>"}).join("")+'</ul>'+
+  '<div class="tip info">'+esc(TMSG[levelText])+'<br><span class="note">A message from me</span></div>'+
+  '<div class="tip info">'+esc(profileText)+'</div><p class="note">This is an estimate. A short chat with a teacher will confirm it.</p>'+
+  '<button id="cp">Copy my result</button>'+
+  '<h2>Your next steps</h2><ul id="plan" style="padding-left:20px;margin:6px 0"></ul>'+
+  '<h2>Where Albanian is spoken</h2>'+albMap()+'<div class="legend"><span><i style="background:var(--red)"></i>Main language</span><span><i style="background:var(--red);opacity:.4"></i>Large Albanian-speaking communities</span></div><ul class="route">'+STOPS.map(function(n,k){return "<li><b>"+(k+1)+"</b>"+n+"</li>"}).join("")+'</ul><p class="note">Simplified map, not to scale. The numbers are the 12 stops of your journey. Albanian is also spoken in Çamëria (Greece), in old Arbëreshë villages in southern Italy, and by many families abroad in Germany, Switzerland, Italy, Greece and the USA.</p>'+
+  '<div class="fact"><b>Did you know?</b>'+shuffle(FACTS).slice(0,3).map(function(f){return "<p style='margin:6px 0'>"+esc(f)+"</p>"}).join("")+'<p style="margin:6px 0">Albanian is also an official language in Kosovo and, since 2019, co-official in North Macedonia.</p></div>'+
+  (wordsList.length?'<h2>Words to learn</h2><ul class="words">'+wordsList.map(function(w){return "<li><b>"+esc(w[0])+"</b> = "+esc(w[1])+"</li>"}).join("")+'</ul>':'')+
+  '<button class="alt" id="pdf">Download my answers and corrections (PDF)</button>'+
+  '<button class="alt" id="card">Download my level card (image)</button>'+
+  '<button class="alt" id="chal">Challenge a friend</button>'+
+  '<p class="note" style="margin-top:14px">Want to improve? Press “Copy my result”, then send it to me with your lesson request on Preply.</p>'+
+  '<a href="https://preply.com/en/tutor/3240239" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none;font:700 1rem Nunito,sans-serif;border-radius:14px;padding:13px 18px;margin-top:10px;background:var(--leaf);color:#fff">I want lessons with you</a>'+
+  '<button class="alt" id="again">Take the test again</button>';
+  document.getElementById("again").onclick=start;
+  document.getElementById("cp").onclick=copy;
+  var pl=document.getElementById("plan"),items=(gaps.length?["Review the basics of "+gaps.join(", ")+" first. A solid base makes the higher levels easier."]:[]).concat(PLAN[top<0?"A1":(best>=5?"C2":LEVELS[best+1].l)]);
+  pl.innerHTML=items.map(function(t){return "<li style='margin:6px 0'>"+esc(t)+"</li>"}).join("");
+  document.getElementById("pdf").onclick=download;
+  document.getElementById("card").onclick=shareCard;
+  document.getElementById("chal").onclick=challenge;
+  confetti();
+}
+function msg(){return "Hi! My name is "+name+". I took your Albanian level test: my level is "+levelText+" (score "+totalScore()+"/"+Q.length+"; "+detail+"). I’d like to book lessons with you. Could we start with a trial lesson?"}
+function copyText(t,b,doneMsg){
+  function done(){b.textContent=doneMsg}
+  function fallback(){var a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy");done()}catch(e){b.textContent="Select and copy: "+t}document.body.removeChild(a)}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,fallback)}else fallback();
+}
+function copy(){copyText(msg(),document.getElementById("cp"),"Copied! Now paste it in your message to me on Preply")}
+function testLink(){return TEST_URL||((/^https?:/.test(location.href))?location.href.split("#")[0].split("?")[0]:"")}
+function challenge(){
+  var l=testLink();
+  copyText("I got "+levelText+" in Albanian ("+totalScore()+"/"+Q.length+"). Can you beat me? "+(l?"Take the test: "+l:"Ask me for the link!"),document.getElementById("chal"),"Copied! Send it to a friend");
+}
+function computeBadges(best){
+  badges=[];
+  if(bestStreak>=8)badges.push("Streak master: "+bestStreak+" in a row");
+  var pk=-1;score.forEach(function(sc,k){if(pk<0&&sc===COUNTS[k])pk=k});
+  if(pk>=0)badges.push("Perfect level: "+LEVELS[pk].l);
+  var cb=false;for(var j=3;j+3<seq.length;j++){if(!seq[j-3]&&!seq[j-2]&&!seq[j-1]&&seq[j]&&seq[j+1]&&seq[j+2]&&seq[j+3]){cb=true;break}}
+  if(cb)badges.push("Comeback");
+  var idk=answers.filter(function(a){return a.a===IDK}).length;
+  if(idk>=3)badges.push("Honest learner");
+  if(score[0]===COUNTS[0]&&score[1]===COUNTS[1])badges.push("Strong foundation");
+  if(best===5)badges.push("Reached Valbonë (C2)");
+}
+function shareCard(){
+  var b=document.getElementById("card");
+  try{
+    var W=1080,H=1350,c=document.createElement("canvas");c.width=W;c.height=H;var x=c.getContext("2d");
+    x.fillStyle="#FCEFEF";x.fillRect(0,0,W,H);
+    x.fillStyle="#C0283D";x.fillRect(0,0,W,24);x.fillRect(0,H-24,W,24);
+    x.textAlign="center";
+    x.fillStyle="#3B1020";x.font="700 54px Nunito,Arial,sans-serif";x.fillText("My Albanian level",W/2,250);
+    x.fillStyle="#C0283D";x.font="800 400px Fraunces,Georgia,serif";x.fillText(levelText,W/2,700);
+    x.fillStyle="#3B1020";x.font="700 60px Nunito,Arial,sans-serif";
+    var nm=name;while(x.measureText(nm).width>W-160&&nm.length>3)nm=nm.slice(0,-1);
+    x.fillText(nm+(nm!==name?"…":""),W/2,860);
+    x.font="500 46px Nunito,Arial,sans-serif";x.fillText("Score "+totalScore()+" / "+Q.length,W/2,950);
+    if(badges.length){x.fillStyle="#C0283D";x.font="700 40px Nunito,Arial,sans-serif";
+      var bt=badges.slice(0,2).join("  ·  ");while(x.measureText(bt).width>W-120&&bt.length>10)bt=bt.slice(0,-1);x.fillText(bt,W/2,1030)}
+    x.fillStyle="#4C8C4A";x.font="700 50px Nunito,Arial,sans-serif";x.fillText("Sa shqip di? Find out yours!",W/2,1120);
+    var link=testLink();
+    if(link){
+      link=link.replace(/^https?:\/\//,"").replace(/\/$/,"");
+      x.fillStyle="#3B1020";x.font="500 40px Nunito,Arial,sans-serif";x.fillText("Take the test:",W/2,1190);
+      var fs=56;x.fillStyle="#C0283D";do{x.font="800 "+fs+"px Nunito,Arial,sans-serif";fs-=2}while(x.measureText(link).width>W-120&&fs>20);
+      x.fillText(link,W/2,1262);
+    }
+    c.toBlob(function(bl){
+      if(!bl){b.textContent="Image did not work here";return}
+      var url=URL.createObjectURL(bl),a=document.createElement("a");a.href=url;a.download="my-albanian-level-"+levelText+".png";document.body.appendChild(a);a.click();document.body.removeChild(a);
+      setTimeout(function(){URL.revokeObjectURL(url)},2000);b.textContent="Saved. Download again";
+    },"image/png");
+  }catch(e){b.textContent="Image did not work here"}
+}
+// ---- PDF: a small built-in PDF writer (A4, Helvetica), so no library is needed ----
+var CP={"€":128,"‚":130,"„":132,"…":133,"‘":145,"’":146,"“":147,"”":148,"•":149,"–":150,"—":151};
+function pdfEnc(t){
+  var o="";
+  for(var k=0;k<t.length;k++){var ch=t[k],c=t.charCodeAt(k);
+    if(CP[ch])o+=String.fromCharCode(CP[ch]);
+    else if(ch==="✓")o+="+";
+    else if(ch==="✗")o+="x";
+    else if(c<256)o+=ch;
+    else{var base=ch.normalize("NFD")[0];o+=base.charCodeAt(0)<128?base:"?"}
+  }
+  return o.replace(/\\/g,"\\\\").replace(/\(/g,"\\(").replace(/\)/g,"\\)");
+}
+function makePDF(blocks){
+  var W=595,H=842,MX=54,MT=60,MB=56,pages=[[]],y=H-MT,cv=document.createElement("canvas").getContext("2d");
+  var FONTS={r:["F1","Arial"],b:["F2","bold Arial"],i:["F3","italic Arial"]};
+  function wrap(text,f,size,width){
+    cv.font=(f==="b"?"bold ":f==="i"?"italic ":"")+size+"px Arial";
+    var words=text.split(/\s+/),lines=[],cur="";
+    words.forEach(function(w){var tr=cur?cur+" "+w:w;if(cv.measureText(tr).width>width&&cur){lines.push(cur);cur=w}else cur=tr});
+    if(cur)lines.push(cur);return lines;
+  }
+  blocks.forEach(function(bk){
+    var size=bk.size||10.5,lh=size*1.35,ind=bk.indent||0,lines=wrap(bk.text,bk.f||"r",size,W-2*MX-ind);
+    y-=(bk.gap||0);
+    if(y-lh<MB&&!bk.keep){pages.push([]);y=H-MT}
+    // keep a whole short block together
+    if(lines.length*lh>H-MT-MB){} else if(y-lines.length*lh<MB){pages.push([]);y=H-MT}
+    lines.forEach(function(ln){
+      if(y-lh<MB){pages.push([]);y=H-MT}
+      var c=bk.color||[0.23,0.06,0.13];
+      pages[pages.length-1].push("BT /"+FONTS[bk.f||"r"][0]+" "+size+" Tf "+c.join(" ")+" rg "+(MX+ind)+" "+y.toFixed(1)+" Td ("+pdfEnc(ln)+") Tj ET");
+      y-=lh;
+    });
+  });
+  var objs=[],n=0;
+  function add(str){objs.push(str);return ++n}
+  add("<< /Type /Catalog /Pages 2 0 R >>");           // 1
+  add("");                                              // 2 (pages, filled later)
+  add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>");        // 3 F1
+  add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>");   // 4 F2
+  add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>");// 5 F3
+  var kids=[];
+  pages.forEach(function(pg,pi){
+    var foot="BT /F1 9 Tf 0.5 0.4 0.45 rg "+(W/2-20)+" 28 Td (Page "+(pi+1)+" of "+pages.length+") Tj ET";
+    var st=pg.join("\n")+"\n"+foot;
+    var cid=add("<< /Length "+st.length+" >>\nstream\n"+st+"\nendstream");
+    var pid=add("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 "+W+" "+H+"] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents "+cid+" 0 R >>");
+    kids.push(pid+" 0 R");
+  });
+  objs[1]="<< /Type /Pages /Kids ["+kids.join(" ")+"] /Count "+kids.length+" >>";
+  var out="%PDF-1.4\n",offs=[];
+  objs.forEach(function(o,k){offs.push(out.length);out+=(k+1)+" 0 obj\n"+o+"\nendobj\n"});
+  var xr=out.length;
+  out+="xref\n0 "+(objs.length+1)+"\n0000000000 65535 f \n"+offs.map(function(o){return ("0000000000"+o).slice(-10)+" 00000 n \n"}).join("")+"trailer\n<< /Size "+(objs.length+1)+" /Root 1 0 R >>\nstartxref\n"+xr+"\n%%EOF";
+  var u=new Uint8Array(out.length);for(var k=0;k<out.length;k++)u[k]=out.charCodeAt(k)&255;
+  return new Blob([u],{type:"application/pdf"});
+}
+function reportBlocks(){
+  var red=[0.75,0.16,0.24],green=[0.2,0.5,0.2],dim=[0.45,0.3,0.35];
+  var B=[
+    {text:"Albanian level test",f:"b",size:20,color:red},
+    {text:name+" · "+new Date().toLocaleDateString(),size:12,gap:4},
+    {text:"Estimated level: "+levelText+"   ·   Score: "+totalScore()+" / "+Q.length,f:"b",size:14,gap:12},
+    {text:detail,size:10.5,color:dim,gap:2},
+    {text:NOTES[levelText],gap:12},
+    {text:profileText,gap:8},
+    ].concat(badges.length?[{text:"Badges: "+badges.join(", "),f:"b",gap:10,color:green}]:[])
+    .concat(wordsList.length?[{text:"Words to learn",f:"b",size:14,color:red,gap:16}].concat(wordsList.map(function(w){return {text:w[0]+" = "+w[1],indent:8,gap:2}})):[])
+    .concat([
+    {text:"Your answers and corrections",f:"b",size:14,color:red,gap:18}
+  ]);
+  answers.forEach(function(a,k){
+    B.push({text:(k+1)+".  Level "+a.l+(a.ok?"   (correct)":(a.a===IDK?"   (I don’t know)":"   (not correct)")),f:"b",size:10.5,gap:12,color:a.ok?green:red});
+    if(a.t)B.push({text:a.t,f:"i",size:10,indent:12,color:dim,gap:2});
+    B.push({text:a.p,gap:2,indent:12});
+    if(a.ok)B.push({text:"Your answer: "+a.a,indent:12,color:green,gap:1});
+    else{
+      B.push({text:"Your answer: "+a.a,indent:12,color:red,gap:1});
+      B.push({text:"Correct answer: "+a.r,f:"b",indent:12,color:green,gap:1});
+      B.push({text:a.e,f:"i",size:10,indent:12,color:dim,gap:2});
+    }
+  });
+  return B;
+}
+function download(){
+  var b=document.getElementById("pdf"),fn="albanian-test-"+name.replace(/[^\p{L}\p{N}.-]+/gu,"-")+".pdf";
+  try{
+    var url=URL.createObjectURL(makePDF(reportBlocks()));
+    var a=document.createElement("a");a.href=url;a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url)},2000);
+    b.textContent="Downloaded. Download again";
+  }catch(e){b.textContent="Download did not work. Please use Copy my result."}
+}
+// ---- text size and dark mode (remembered on this device when possible) ----
+(function(){
+  var root=document.documentElement,ts=document.getElementById("tsize"),tm=document.getElementById("tmode");
+  function get(k){try{return localStorage.getItem(k)}catch(e){return null}}
+  function put(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+  function dark(){var md=root.getAttribute("data-mode");return md?md==="dark":(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)}
+  function label(){tm.textContent=dark()?"Light mode":"Dark mode";ts.textContent=root.getAttribute("data-size")==="large"?"A–":"Aa"}
+  var sm=get("mode"),sz=get("size");if(sm)root.setAttribute("data-mode",sm);if(sz)root.setAttribute("data-size",sz);
+  ts.onclick=function(){var v=root.getAttribute("data-size")==="large"?"normal":"large";root.setAttribute("data-size",v);put("size",v);label()};
+  tm.onclick=function(){var v=dark()?"light":"dark";root.setAttribute("data-mode",v);put("mode",v);label()};
+  label();
+})();
+start();
+</script>
+
+</body>
+</html>
